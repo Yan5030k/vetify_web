@@ -724,3 +724,29 @@ textarea {
         align-items: flex-start;
     }
 }
+
+
+.actions-cell {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 4px;
+    font-size: 13px;
+    color: var(--primary-dark);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+}
+
+.link-danger {
+    color: var(--danger);
+}
+

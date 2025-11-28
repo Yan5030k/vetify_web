@@ -1,5 +1,4 @@
 from datetime import datetime
-from collections import OrderedDict
 
 from flask import (
     Flask, render_template, request, redirect, url_for, flash
@@ -22,6 +21,9 @@ from services import (
     analizar_urgencia,
     existe_cita_en_horario,
     obtener_cita_por_id,
+    obtener_cita_cruda,
+    actualizar_cita,
+    eliminar_cita,
 )
 
 app = Flask(__name__)
@@ -154,7 +156,7 @@ def appointment():
 @app.route("/agenda")
 def agenda():
     """
-    Agenda del día actual (la dejamos como vista auxiliar).
+    Agenda del día actual (vista auxiliar).
     """
     citas = listar_citas_hoy()
     total_mascotas = contar_mascotas()
@@ -174,7 +176,7 @@ def agenda():
 @app.route("/citas")
 def citas():
     """
-    Vista tipo calendario mensual/lista agrupada por día con filtro por urgencia.
+    Vista tipo calendario: citas agrupadas por día, con filtro por urgencia.
     """
     urgencia_filtro = request.args.get("urg", "todas").lower()
     citas = listar_citas_todas()
@@ -204,7 +206,6 @@ def citas():
     for c in citas_filtradas:
         fecha_iso = c["fecha_hora"][:10]  # YYYY-MM-DD
         if fecha_iso != current_date:
-            # iniciar nuevo grupo
             current_date = fecha_iso
             dt = datetime.fromisoformat(fecha_iso)
             dia_nombre = dias_semana[dt.weekday()]
@@ -233,6 +234,83 @@ def cita_detalle(cita_id: int):
         flash("La cita seleccionada no existe.", "error")
         return redirect(url_for("citas"))
     return render_template("cita_detalle.html", cita=cita)
+
+
+@app.route("/cita/<int:cita_id>/editar", methods=["GET", "POST"])
+def cita_editar(cita_id: int):
+    cita = obtener_cita_cruda(cita_id)
+    if not cita:
+        flash("La cita seleccionada no existe.", "error")
+        return redirect(url_for("citas"))
+
+    mascotas = listar_mascotas()
+    vets = listar_veterinarios()
+
+    if request.method == "POST":
+        mascota_id = request.form.get("mascota_id")
+        vet_id = request.form.get("vet_id")
+        tipo_servicio = request.form.get("tipo_servicio", "Consulta")
+        sintomas = request.form.get("sintomas", "")
+        fecha_str = request.form.get("fecha_cita", "").strip()
+        hora_str = request.form.get("hora_cita", "").strip()
+
+        try:
+            mascota_id = int(mascota_id)
+            vet_id = int(vet_id)
+        except (TypeError, ValueError):
+            flash("Selecciona una mascota y un veterinario válidos.", "error")
+            return redirect(url_for("cita_editar", cita_id=cita_id))
+
+        if not fecha_str or not hora_str:
+            flash("Indica la fecha y la hora de la cita.", "error")
+            return redirect(url_for("cita_editar", cita_id=cita_id))
+
+        try:
+            fecha_hora = datetime.fromisoformat(f"{fecha_str}T{hora_str}")
+        except ValueError:
+            flash("Formato de fecha u hora no válido.", "error")
+            return redirect(url_for("cita_editar", cita_id=cita_id))
+
+        # Evitar choque de horario con otras citas del mismo vet
+        if existe_cita_en_horario(vet_id, fecha_hora, excluir_id=cita_id):
+            flash(
+                "El profesional seleccionado ya tiene otra cita en esa fecha y hora. "
+                "Por favor elige otro horario.",
+                "error"
+            )
+            return redirect(url_for("cita_editar", cita_id=cita_id))
+
+        urgencia = analizar_urgencia(sintomas)
+        actualizar_cita(cita_id, mascota_id, vet_id, fecha_hora, tipo_servicio, sintomas, urgencia)
+
+        flash("Cita actualizada correctamente.", "success")
+        return redirect(url_for("cita_detalle", cita_id=cita_id))
+
+    # Prellenar valores
+    dt = datetime.fromisoformat(cita["fecha_hora"])
+    fecha_cita = dt.date().isoformat()
+    hora_cita = dt.time().strftime("%H:%M")
+
+    return render_template(
+        "cita_editar.html",
+        cita=cita,
+        mascotas=mascotas,
+        vets=vets,
+        fecha_cita=fecha_cita,
+        hora_cita=hora_cita
+    )
+
+
+@app.route("/cita/<int:cita_id>/eliminar", methods=["POST"])
+def cita_eliminar(cita_id: int):
+    cita = obtener_cita_cruda(cita_id)
+    if not cita:
+        flash("La cita seleccionada ya no existe.", "error")
+        return redirect(url_for("citas"))
+
+    eliminar_cita(cita_id)
+    flash("Cita eliminada correctamente.", "success")
+    return redirect(url_for("citas"))
 
 
 @app.route("/pacientes")

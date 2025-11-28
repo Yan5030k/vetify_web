@@ -4,13 +4,8 @@
 {% block content %}
 <div class="card">
     <h1>Detalle de la cita</h1>
-    {% set dt = cita['fecha_hora'] %}
-    {% set fecha = dt[0:10] %}
-    {% set hora = dt[11:16] %}
-
     <p class="form-sub">
-        Información completa de la cita seleccionada, incluyendo responsable,
-        paciente, profesional y síntomas reportados.
+        Información completa de la cita seleccionada.
     </p>
 
     <div class="detalle-grid">
@@ -28,18 +23,21 @@
         </section>
 
         <section>
-            <h2>👨‍⚕️ Profesional</h2>
+            <h2>👨‍⚕️ Veterinario</h2>
             <p><strong>Nombre:</strong> {{ cita['vet'] }}</p>
             <p><strong>Especialidad:</strong> {{ cita['vet_especialidad'] }}</p>
             <p><strong>Teléfono:</strong> {{ cita['vet_telefono'] }}</p>
         </section>
 
         <section>
-            <h2>🗓️ Cita</h2>
-            <p><strong>Fecha:</strong> {{ fecha }}</p>
-            <p><strong>Hora:</strong> {{ hora }}</p>
-            <p><strong>Servicio:</strong> {{ cita['tipo_servicio'] }}</p>
-            <p><strong>Urgencia clasificada:</strong>
+            <h2>📅 Cita</h2>
+            {% set dt = cita['fecha_hora'] %}
+            <p><strong>Fecha:</strong> {{ dt[8:10] }}/{{ dt[5:7] }}/{{ dt[0:4] }}</p>
+            <p><strong>Hora:</strong> {{ dt[11:16] }}</p>
+            <p><strong>Tipo de servicio:</strong> {{ cita['tipo_servicio'] }}</p>
+            <p><strong>Estado:</strong> {{ cita['estado'] }}</p>
+            <p>
+                <strong>Nivel de urgencia:</strong>
                 {% set urg = (cita['urgencia'] or '').lower() %}
                 {% if urg == 'alta' %}
                     <span class="urg-tag urg-alta">ALTA</span>
@@ -51,21 +49,33 @@
                     <span class="urg-tag">N/A</span>
                 {% endif %}
             </p>
-            <p><strong>Estado:</strong> {{ cita['estado'] | capitalize }}</p>
         </section>
     </div>
 
-    <section class="detalle-sintomas">
-        <h2>🩺 Síntomas reportados</h2>
-        {% if cita['sintomas'] %}
-            <p class="texto-sintomas">{{ cita['sintomas'] }}</p>
-        {% else %}
-            <p class="texto-sintomas">No se registró descripción de síntomas para esta cita.</p>
-        {% endif %}
-    </section>
+    <div class="detalle-sintomas">
+        <h2>Síntomas / motivo</h2>
+        <div class="texto-sintomas">
+            {% if cita['sintomas'] %}
+                {{ cita['sintomas'] }}
+            {% else %}
+                <span class="symptoms-empty">Sin descripción registrada.</span>
+            {% endif %}
+        </div>
+    </div>
 
-    <div class="form-actions">
-        <a class="btn btn-secondary" href="{{ url_for('agenda') }}">Volver a la agenda</a>
+    <div class="form-actions" style="margin-top: 16px; justify-content: space-between;">
+        <div>
+            <a href="{{ url_for('citas') }}" class="btn btn-secondary">Volver a calendario</a>
+        </div>
+        <div>
+            <a href="{{ url_for('cita_editar', cita_id=cita['id']) }}" class="btn btn-primary">Editar cita</a>
+            <form action="{{ url_for('cita_eliminar', cita_id=cita['id']) }}"
+                  method="post"
+                  style="display:inline;"
+                  onsubmit="return confirm('¿Seguro que deseas eliminar esta cita?');">
+                <button type="submit" class="btn btn-secondary">Eliminar</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict
 from db import get_connection
 
 
@@ -57,7 +57,7 @@ def listar_mascotas():
         SELECT m.id, m.nombre, m.tipo, d.nombre AS dueno
         FROM mascotas m
         JOIN duenos d ON m.dueno_id = d.id
-        ORDER BY m.id;
+        ORDER BY m.nombre;
     """)
     filas = cur.fetchall()
     conn.close()
@@ -178,7 +178,9 @@ def listar_citas_todas():
                m.nombre      AS mascota,
                m.tipo        AS tipo_mascota,
                d.nombre      AS dueno,
-               v.nombre      AS vet
+               v.nombre      AS vet,
+               c.mascota_id  AS mascota_id,
+               c.vet_id      AS vet_id
         FROM citas c
         JOIN mascotas m ON c.mascota_id = m.id
         JOIN duenos d   ON m.dueno_id = d.id
@@ -192,7 +194,7 @@ def listar_citas_todas():
 
 def obtener_cita_por_id(cita_id: int):
     """
-    Devuelve una sola cita con toda la información relacionada.
+    Devuelve una sola cita con toda la información relacionada (para detalle).
     """
     conn = get_connection()
     cur = conn.cursor()
@@ -222,6 +224,62 @@ def obtener_cita_por_id(cita_id: int):
     return fila
 
 
+def obtener_cita_cruda(cita_id: int):
+    """
+    Devuelve la cita directamente de la tabla citas (para editar: ids y fecha/hora exacta).
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id,
+               mascota_id,
+               vet_id,
+               fecha_hora,
+               tipo_servicio,
+               sintomas,
+               urgencia,
+               estado
+        FROM citas
+        WHERE id = ?;
+    """, (cita_id,))
+    fila = cur.fetchone()
+    conn.close()
+    return fila
+
+
+def actualizar_cita(
+    cita_id: int,
+    mascota_id: int,
+    vet_id: int,
+    fecha_hora: datetime,
+    tipo_servicio: str,
+    sintomas: str,
+    urgencia: str
+) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE citas
+        SET mascota_id = ?,
+            vet_id = ?,
+            fecha_hora = ?,
+            tipo_servicio = ?,
+            sintomas = ?,
+            urgencia = ?
+        WHERE id = ?;
+    """, (mascota_id, vet_id, fecha_hora.isoformat(), tipo_servicio, sintomas, urgencia, cita_id))
+    conn.commit()
+    conn.close()
+
+
+def eliminar_cita(cita_id: int) -> None:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM citas WHERE id = ?;", (cita_id,))
+    conn.commit()
+    conn.close()
+
+
 def contar_citas_hoy() -> int:
     hoy = datetime.now().date().isoformat()
     conn = get_connection()
@@ -247,18 +305,25 @@ def contar_citas_urgencia_hoy() -> Dict[str, int]:
     return {row[0] or "": int(row[1]) for row in filas}
 
 
-def existe_cita_en_horario(vet_id: int, fecha_hora: datetime) -> bool:
+def existe_cita_en_horario(vet_id: int, fecha_hora: datetime, excluir_id: int | None = None) -> bool:
     """
     Devuelve True si el veterinario ya tiene una cita exactamente
-    en esa fecha y hora (bloqueo de doble reserva).
+    en esa fecha y hora. Permite opcionalmente excluir una cita (para edición).
     """
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT COUNT(*) AS c
-        FROM citas
-        WHERE vet_id = ? AND fecha_hora = ?;
-    """, (vet_id, fecha_hora.isoformat()))
+    if excluir_id is None:
+        cur.execute("""
+            SELECT COUNT(*) AS c
+            FROM citas
+            WHERE vet_id = ? AND fecha_hora = ?;
+        """, (vet_id, fecha_hora.isoformat()))
+    else:
+        cur.execute("""
+            SELECT COUNT(*) AS c
+            FROM citas
+            WHERE vet_id = ? AND fecha_hora = ? AND id != ?;
+        """, (vet_id, fecha_hora.isoformat(), excluir_id))
     c = cur.fetchone()["c"]
     conn.close()
     return bool(c and c > 0)
@@ -293,10 +358,10 @@ def analizar_urgencia(sintomas: str) -> str:
         # si además menciona sangrado → subir a ALTA
         if "sangra" in texto or "sangrado" in texto or "hemorragia" in texto:
             return "alta"
-        # si solo dice que se abrió, que la herida está mal, etc. → MEDIA
+        # si dice que se abrió / está abierta → MEDIA
         if "abrió" in texto or "abrio" in texto or "abierta" in texto or "abierto" in texto or "se le abrió" in texto:
             return "media"
-        # cualquier mención de herida / puntos ya la consideramos al menos MEDIA
+        # cualquier herida post-operatoria la consideramos al menos MEDIA
         return "media"
 
     # --- síntomas de URGENCIA MEDIA ---
@@ -304,7 +369,7 @@ def analizar_urgencia(sintomas: str) -> str:
         "no quiere jugar",
         "triste",
         "no bebe",
-        "apatía", "apatico", "apática", "apática",
+        "apatía", "apatico", "apática",
         "diarrea",
         "tos",
         "cojea", "cojera",
@@ -315,5 +380,5 @@ def analizar_urgencia(sintomas: str) -> str:
         if p in texto:
             return "media"
 
-    # Si no encontramos nada grave, asumimos baja urgencia (controles, chequeos generales, etc.)
+    # Si no hay palabras clave graves, se asume baja urgencia
     return "baja"

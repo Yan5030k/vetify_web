@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Editar cita{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+    <h1>Editar cita</h1>
+    <p class="form-sub">
+        Actualiza los datos de la cita seleccionada. Puedes cambiar el paciente, profesional,
+        fecha, horario y descripción de síntomas.
+    </p>
+
+    <form method="post" action="{{ url_for('cita_editar', cita_id=cita['id']) }}">
+        <div class="form-grid">
+            <!-- Columna: Paciente y profesional -->
+            <section>
+                <h2>🐾 Paciente y profesional</h2>
+
+                <label>
+                    <span>Mascota</span>
+                    <select name="mascota_id" required>
+                        {% for m in mascotas %}
+                        <option value="{{ m['id'] }}"
+                                {% if m['id'] == cita['mascota_id'] %}selected{% endif %}>
+                            {{ m['nombre'] }} ({{ m['tipo'] }}) · Responsable: {{ m['dueno'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    <span>Veterinario</span>
+                    <select name="vet_id" required>
+                        {% for v in vets %}
+                        <option value="{{ v['id'] }}"
+                                {% if v['id'] == cita['vet_id'] %}selected{% endif %}>
+                            {{ v['nombre'] }} · {{ v['especialidad'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    <span>Tipo de servicio</span>
+                    <select name="tipo_servicio">
+                        {% set ts = cita['tipo_servicio'] %}
+                        <option value="Consulta" {% if ts == 'Consulta' %}selected{% endif %}>Consulta general</option>
+                        <option value="Control post-operatorio" {% if ts == 'Control post-operatorio' %}selected{% endif %}>Control post-operatorio</option>
+                        <option value="Vacunación" {% if ts == 'Vacunación' %}selected{% endif %}>Vacunación</option>
+                        <option value="Desparasitación" {% if ts == 'Desparasitación' %}selected{% endif %}>Desparasitación</option>
+                        <option value="Emergencia" {% if ts == 'Emergencia' %}selected{% endif %}>Atención de emergencia</option>
+                        <option value="Otro" {% if ts == 'Otro' %}selected{% endif %}>Otro</option>
+                    </select>
+                </label>
+            </section>
+
+            <!-- Columna: Fecha, hora y síntomas -->
+            <section>
+                <h2>🗓️ Fecha, horario y síntomas</h2>
+
+                <label>
+                    <span>Fecha de la cita</span>
+                    <input type="date" name="fecha_cita" value="{{ fecha_cita }}" required>
+                </label>
+
+                <label>
+                    <span>Horario disponible (cada 30 minutos)</span>
+                    <select name="hora_cita" required>
+                        <option value="" disabled>Selecciona un horario</option>
+
+                        <!-- Mañana -->
+                        <optgroup label="Mañana (07:00 - 11:30)">
+                            {% for h in ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30'] %}
+                            <option value="{{ h }}" {% if h == hora_cita %}selected{% endif %}>{{ h }}</option>
+                            {% endfor %}
+                        </optgroup>
+
+                        <!-- Almuerzo -->
+                        <optgroup label="12:00 - 13:00 · Horario de almuerzo (no disponible)">
+                        </optgroup>
+
+                        <!-- Tarde -->
+                        <optgroup label="Tarde (13:00 - 16:30)">
+                            {% for h in ['13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30'] %}
+                            <option value="{{ h }}" {% if h == hora_cita %}selected{% endif %}>{{ h }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Síntomas / motivo de la consulta</span>
+                    <textarea name="sintomas" rows="4"
+                              placeholder="Describe brevemente lo que presenta la mascota...">{{ cita['sintomas'] }}</textarea>
+                </label>
+            </section>
+
+            <div class="form-actions">
+                <a href="{{ url_for('cita_detalle', cita_id=cita['id']) }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
