@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Nueva cita{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+    <h1>Nueva cita</h1>
+    <p class="form-sub">
+        Programa una cita seleccionando el paciente, el profesional, el tipo de servicio
+        y la fecha y hora disponibles.
+    </p>
+
+    <form method="post" action="{{ url_for('appointment') }}">
+        <div class="form-grid">
+            <!-- Columna: Paciente y profesional -->
+            <section>
+                <h2>🐾 Paciente y profesional</h2>
+
+                <label>
+                    <span>Mascota</span>
+                    <select name="mascota_id" required>
+                        <option value="" disabled selected>Selecciona una mascota</option>
+                        {% for m in mascotas %}
+                        <option value="{{ m['id'] }}">
+                            {{ m['nombre'] }} ({{ m['tipo'] }}) · Responsable: {{ m['dueno'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    <span>Veterinario</span>
+                    <select name="vet_id" required>
+                        <option value="" disabled selected>Selecciona un profesional</option>
+                        {% for v in vets %}
+                        <option value="{{ v['id'] }}">
+                            {{ v['nombre'] }} · {{ v['especialidad'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>
+                    <span>Tipo de servicio</span>
+                    <select name="tipo_servicio">
+                        <option value="Consulta">Consulta general</option>
+                        <option value="Control post-operatorio">Control post-operatorio</option>
+                        <option value="Vacunación">Vacunación</option>
+                        <option value="Desparasitación">Desparasitación</option>
+                        <option value="Emergencia">Atención de emergencia</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </label>
+            </section>
+
+            <!-- Columna: Fecha, hora y síntomas -->
+            <section>
+                <h2>🗓️ Fecha, horario y síntomas</h2>
+
+                <label>
+                    <span>Fecha de la cita</span>
+                    <input type="date" name="fecha_cita" required>
+                </label>
+
+                <label>
+                    <span>Horario disponible (cada 30 minutos)</span>
+                    <select name="hora_cita" required>
+                        <option value="" disabled selected>Selecciona un horario</option>
+
+                        <!-- Mañana -->
+                        <optgroup label="Mañana (07:00 - 11:30)">
+                            <option value="07:00">07:00</option>
+                            <option value="07:30">07:30</option>
+                            <option value="08:00">08:00</option>
+                            <option value="08:30">08:30</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                        </optgroup>
+
+                        <!-- Almuerzo -->
+                        <optgroup label="12:00 - 13:00 · Horario de almuerzo (no disponible)">
+                            <!-- Sin opciones aquí a propósito -->
+                        </optgroup>
+
+                        <!-- Tarde -->
+                        <optgroup label="Tarde (13:00 - 16:30)">
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:30">16:30</option>
+                        </optgroup>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Síntomas / motivo de la consulta</span>
+                    <textarea name="sintomas" rows="4"
+                              placeholder="Describe brevemente lo que presenta la mascota (ej. no come, diarrea, se le abrió la herida, está muy débil)..."></textarea>
+                </label>
+            </section>
+
+            <div class="form-actions">
+                <a href="{{ url_for('citas') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar cita</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

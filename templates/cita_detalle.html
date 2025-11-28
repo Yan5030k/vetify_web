@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Detalle de cita{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Detalle de la cita</h1>
+    {% set dt = cita['fecha_hora'] %}
+    {% set fecha = dt[0:10] %}
+    {% set hora = dt[11:16] %}
+
+    <p class="form-sub">
+        Información completa de la cita seleccionada, incluyendo responsable,
+        paciente, profesional y síntomas reportados.
+    </p>
+
+    <div class="detalle-grid">
+        <section>
+            <h2>🐾 Paciente</h2>
+            <p><strong>Nombre:</strong> {{ cita['mascota'] }}</p>
+            <p><strong>Tipo:</strong> {{ cita['tipo_mascota'] }}</p>
+        </section>
+
+        <section>
+            <h2>👤 Responsable</h2>
+            <p><strong>Nombre:</strong> {{ cita['dueno'] }}</p>
+            <p><strong>Teléfono:</strong> {{ cita['dueno_telefono'] }}</p>
+            <p><strong>Correo:</strong> {{ cita['dueno_correo'] }}</p>
+        </section>
+
+        <section>
+            <h2>👨‍⚕️ Profesional</h2>
+            <p><strong>Nombre:</strong> {{ cita['vet'] }}</p>
+            <p><strong>Especialidad:</strong> {{ cita['vet_especialidad'] }}</p>
+            <p><strong>Teléfono:</strong> {{ cita['vet_telefono'] }}</p>
+        </section>
+
+        <section>
+            <h2>🗓️ Cita</h2>
+            <p><strong>Fecha:</strong> {{ fecha }}</p>
+            <p><strong>Hora:</strong> {{ hora }}</p>
+            <p><strong>Servicio:</strong> {{ cita['tipo_servicio'] }}</p>
+            <p><strong>Urgencia clasificada:</strong>
+                {% set urg = (cita['urgencia'] or '').lower() %}
+                {% if urg == 'alta' %}
+                    <span class="urg-tag urg-alta">ALTA</span>
+                {% elif urg == 'media' %}
+                    <span class="urg-tag urg-media">MEDIA</span>
+                {% elif urg == 'baja' %}
+                    <span class="urg-tag urg-baja">BAJA</span>
+                {% else %}
+                    <span class="urg-tag">N/A</span>
+                {% endif %}
+            </p>
+            <p><strong>Estado:</strong> {{ cita['estado'] | capitalize }}</p>
+        </section>
+    </div>
+
+    <section class="detalle-sintomas">
+        <h2>🩺 Síntomas reportados</h2>
+        {% if cita['sintomas'] %}
+            <p class="texto-sintomas">{{ cita['sintomas'] }}</p>
+        {% else %}
+            <p class="texto-sintomas">No se registró descripción de síntomas para esta cita.</p>
+        {% endif %}
+    </section>
+
+    <div class="form-actions">
+        <a class="btn btn-secondary" href="{{ url_for('agenda') }}">Volver a la agenda</a>
+    </div>
+</div>
+{% endblock %}

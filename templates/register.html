@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Registrar paciente{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+    <h1>Registrar responsable y mascota</h1>
+    <p class="form-sub">
+        Completa los datos para crear un nuevo paciente en Vetify.
+    </p>
+
+    <form method="post" class="form-grid">
+        <section>
+            <h2>👤 Responsable del paciente</h2>
+
+            <label>
+                <span>Nombre completo</span>
+                <input type="text" name="owner_name" required>
+            </label>
+
+            <label>
+                <span>Teléfono</span>
+                <input type="text" name="owner_phone" required>
+            </label>
+
+            <label>
+                <span>Correo electrónico</span>
+                <input type="email" name="owner_email" required>
+            </label>
+        </section>
+
+        <section>
+            <h2>🐾 Mascota</h2>
+
+            <label>
+                <span>Nombre de la mascota</span>
+                <input type="text" name="pet_name" required>
+            </label>
+
+            <label>
+                <span>Tipo</span>
+                <select name="pet_type">
+                    <option>Perro</option>
+                    <option>Gato</option>
+                    <option>Ave</option>
+                    <option>Conejo</option>
+                    <option>Otro</option>
+                </select>
+            </label>
+
+            <label>
+                <span>Raza</span>
+                <input type="text" name="pet_breed">
+            </label>
+
+            <div class="form-row">
+                <label>
+                    <span>Edad (años)</span>
+                    <input type="number" name="pet_age" min="0" step="1" value="0">
+                </label>
+                <label>
+                    <span>Peso (kg)</span>
+                    <input type="number" name="pet_weight" min="0" step="0.1" value="0">
+                </label>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a class="btn btn-secondary" href="{{ url_for('index') }}">Cancelar</a>
+            <button class="btn btn-primary" type="submit">Guardar paciente</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

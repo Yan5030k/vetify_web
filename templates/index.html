@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="layout">
+
+    <section class="card hero">
+        <div class="hero-text">
+
+            <div class="hero-logo">
+                <img src="{{ url_for('static', filename='img/Negro.png') }}"
+                     alt="Vetify">
+            </div>
+
+            <h1>Bienvenido a <span>Vetify</span></h1>
+            <p class="hero-sub">
+                Plataforma web para gestionar pacientes y citas de una clínica veterinaria,
+                con clasificación automática de urgencia según los síntomas.
+            </p>
+
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <div class="hero-icon">📋</div>
+                    <div>
+                        <h3>Gestión de pacientes</h3>
+                        <p>Registra responsables y mascotas en un flujo sencillo y ordenado.</p>
+                    </div>
+                </div>
+
+                <div class="hero-feature">
+                    <div class="hero-icon">🤖</div>
+                    <div>
+                        <h3>Análisis de síntomas</h3>
+                        <p>El sistema estima el nivel de urgencia a partir de la descripción ingresada.</p>
+                    </div>
+                </div>
+
+                <div class="hero-feature">
+                    <div class="hero-icon">📅</div>
+                    <div>
+                        <h3>Agenda clara</h3>
+                        <p>Visualiza las citas del día con colores por nivel de urgencia.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ url_for('register') }}">
+                    ✍️ Registrar paciente
+                </a>
+                <a class="btn btn-secondary" href="{{ url_for('agenda') }}">
+                    📆 Ver agenda de hoy
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <aside class="card stats">
+        <h2>Resumen rápido</h2>
+        <p class="stats-desc">Indicadores clave obtenidos a partir de los datos registrados.</p>
+
+        <div class="stat-item">
+            <span class="stat-title">Pacientes registrados</span>
+            <span class="stat-value">{{ total_mascotas }}</span>
+            <span class="stat-note">Mascotas activas en Vetify.</span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-title">Responsables</span>
+            <span class="stat-value">{{ total_duenos }}</span>
+            <span class="stat-note">Personas asociadas a pacientes.</span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-title">Citas para hoy</span>
+            <span class="stat-value">{{ total_citas_hoy }}</span>
+            <span class="stat-note">Agenda del día actual.</span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-title">Urgencias altas</span>
+            <span class="stat-value stat-urgent">{{ urg_altas }}</span>
+            <span class="stat-note">Casos que requieren atención prioritaria.</span>
+        </div>
+    </aside>
+
+</div>
+{% endblock %}

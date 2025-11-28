@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Vetify{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/Blanco.png') }}">
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a class="brand-link" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/Blanco.png') }}" class="brand-logo-img" alt="Vetify">
+            </a>
+
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Inicio</a>
+                <a href="{{ url_for('citas') }}">Citas</a>
+                <a href="{{ url_for('pacientes') }}">Pacientes</a>
+                <a href="{{ url_for('register') }}">Registrar paciente</a>
+                <a href="{{ url_for('appointment') }}">Nueva cita</a>
+                <a href="{{ url_for('vets') }}">Equipo</a>
+            </div>
+
+            <span class="badge">Feria de Innovación Tecnológica</span>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class="flash flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer">
+        Vetify · Gestión inteligente de citas veterinarias · 2025
+    </div>
+</body>
+</html>

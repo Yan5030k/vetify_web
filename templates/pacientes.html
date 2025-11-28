@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Pacientes registrados{% endblock %}
+
+{% block content %}
+<div class="card pacientes-page">
+    <h1>Pacientes registrados</h1>
+    <p class="form-sub">
+        Listado completo de mascotas registradas en Vetify, con la información de sus responsables.
+    </p>
+
+    {% if pacientes %}
+    <div class="patients-header">
+        <span class="calendar-total">
+            Total de pacientes: <strong>{{ total }}</strong>
+        </span>
+    </div>
+
+    <div class="patients-grid">
+        {% for p in pacientes %}
+
+        {# ==== Seleccionar emoji según tipo ==== #}
+        {% set tipo = p['tipo']|lower %}
+
+        {% if 'perro' in tipo or 'canino' in tipo %}
+            {% set avatar = '🐶' %}
+        {% elif 'gato' in tipo or 'felino' in tipo %}
+            {% set avatar = '🐱' %}
+        {% elif 'ave' in tipo or 'pájaro' in tipo or 'pajaro' in tipo or 'perico' in tipo %}
+            {% set avatar = '🐦' %}
+        {% elif 'conejo' in tipo %}
+            {% set avatar = '🐰' %}
+        {% elif 'pez' in tipo %}
+            {% set avatar = '🐠' %}
+        {% elif 'reptil' in tipo or 'lagarto' in tipo %}
+            {% set avatar = '🐍' %}
+        {% elif 'hamster' in tipo or 'hámster' in tipo %}
+            {% set avatar = '🐹' %}
+        {% elif 'tortuga' in tipo %}
+            {% set avatar = '🐢' %}
+        {% else %}
+            {% set avatar = '🐾' %}
+        {% endif %}
+
+        <article class="patient-card">
+            <header class="patient-header">
+                <div class="patient-avatar">
+                    {{ avatar }}
+                </div>
+
+                <div>
+                    <h2 class="patient-name">{{ p['nombre'] }}</h2>
+                    <span class="patient-type">{{ p['tipo'] }}</span>
+                </div>
+            </header>
+
+            <div class="patient-body">
+                <p class="patient-line"><strong>Raza:</strong> {{ p['raza'] or 'No especificada' }}</p>
+                <p class="patient-line">
+                    <strong>Edad:</strong> {{ p['edad'] }} año{{ 's' if p['edad'] != 1 }} ·
+                    <strong>Peso:</strong> {{ p['peso'] }} kg
+                </p>
+                <p class="patient-line"><strong>Responsable:</strong> {{ p['dueno'] }}</p>
+                <p class="patient-line"><strong>Teléfono:</strong> {{ p['dueno_telefono'] }}</p>
+                <p class="patient-line"><strong>Correo:</strong> {{ p['dueno_correo'] }}</p>
+            </div>
+        </article>
+
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No hay pacientes registrados.</p>
+    {% endif %}
+</div>
+{% endblock %}

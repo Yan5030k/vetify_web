@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Equipo veterinario{% endblock %}
+
+{% block content %}
+<div class="card vets-page">
+    <h1>Equipo veterinario</h1>
+    <p class="form-sub">
+        Profesionales especializados listos para brindar atención integral a tus mascotas.
+    </p>
+
+    {% if veterinarios %}
+    <div class="vets-grid">
+        {% for v in veterinarios %}
+        <article class="vet-card">
+            <header class="vet-header">
+                <div class="vet-avatar">🐾</div>
+
+                <div>
+                    <h2 class="vet-name">{{ v['nombre'] }}</h2>
+                    <span class="vet-specialty">{{ v['especialidad'] }}</span>
+                </div>
+            </header>
+
+            <div class="vet-body">
+                <p class="vet-info"><strong>Teléfono:</strong> {{ v['telefono'] }}</p>
+
+                <div class="vet-schedule">
+                    <h4>🕒 Horarios de atención</h4>
+                    <ul>
+                        <li><strong>Lunes a Viernes:</strong> 7:00 AM – 4:00 PM</li>
+                        <li><strong>Sábado:</strong> 7:00 AM – 12:00 PM</li>
+                        <li><strong>Domingo:</strong> No disponible</li>
+                    </ul>
+                </div>
+            </div>
+
+            <footer class="vet-footer">
+                <span class="vet-chip">Veterinario activo</span>
+            </footer>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No hay veterinarios registrados.</p>
+    {% endif %}
+</div>
+{% endblock %}

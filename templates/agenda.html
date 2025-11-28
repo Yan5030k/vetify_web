@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Citas de hoy{% endblock %}
+
+{% block content %}
+<div class="layout-vertical">
+    <div class="stats-row">
+        <div class="card stat-card">
+            <h2>Pacientes registrados</h2>
+            <span class="stat-value">{{ total_mascotas }}</span>
+            <p>Mascotas activas en Vetify.</p>
+        </div>
+        <div class="card stat-card">
+            <h2>Citas de hoy</h2>
+            <span class="stat-value">{{ total_citas_hoy }}</span>
+            <p>Agenda del día actual.</p>
+        </div>
+        <div class="card stat-card">
+            <h2>Urgencias altas</h2>
+            <span class="stat-value urgent">{{ urg_altas }}</span>
+            <p>Casos que requieren atención prioritaria.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h1>Agenda de citas del día</h1>
+        <p class="form-sub">
+            Citas programadas para la fecha actual, con nivel de urgencia,
+            síntomas reportados y profesional asignado.
+        </p>
+
+        {% if citas %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Mascota</th>
+                    <th>Responsable</th>
+                    <th>Servicio</th>
+                    <th>Urgencia</th>
+                    <th>Síntomas (resumen)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in citas %}
+                {% set urg = (c['urgencia'] or '').lower() %}
+                <tr class="urg-{{ urg }}">
+                    {% set dt = c['fecha_hora'] %}
+                    <td>{{ dt[11:16] }}</td>
+                    <td>{{ c['mascota'] }}</td>
+                    <td>{{ c['dueno'] }}</td>
+                    <td>{{ c['tipo_servicio'] }}</td>
+                    <td class="urg-cell">
+                        {% if urg == 'alta' %}
+                            <span class="urg-tag urg-alta">ALTA</span>
+                        {% elif urg == 'media' %}
+                            <span class="urg-tag urg-media">MEDIA</span>
+                        {% elif urg == 'baja' %}
+                            <span class="urg-tag urg-baja">BAJA</span>
+                        {% else %}
+                            <span class="urg-tag">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="symptoms-cell">
+                        {% if c['sintomas'] %}
+                            {% if c['sintomas']|length > 70 %}
+                                {{ c['sintomas'][:70] }}…
+                            {% else %}
+                                {{ c['sintomas'] }}
+                            {% endif %}
+                        {% else %}
+                            <span class="symptoms-empty">Sin descripción</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="details-link"
+                           href="{{ url_for('cita_detalle', cita_id=c['id']) }}">
+                            Ver detalle
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay citas registradas para hoy.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
