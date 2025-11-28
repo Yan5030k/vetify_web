@@ -15,12 +15,35 @@
             </a>
 
             <div class="nav-links">
-                <a href="{{ url_for('index') }}">Inicio</a>
-                <a href="{{ url_for('citas') }}">Citas</a>
-                <a href="{{ url_for('pacientes') }}">Pacientes</a>
-                <a href="{{ url_for('register') }}">Registrar paciente</a>
-                <a href="{{ url_for('appointment') }}">Nueva cita</a>
-                <a href="{{ url_for('vets') }}">Equipo</a>
+                <a href="{{ url_for('index') }}"
+                   class="{% if request.endpoint == 'index' %}active{% endif %}">
+                    Inicio
+                </a>
+
+                <a href="{{ url_for('citas') }}"
+                   class="{% if request.endpoint == 'citas' %}active{% endif %}">
+                    Citas
+                </a>
+
+                <a href="{{ url_for('pacientes') }}"
+                   class="{% if request.endpoint == 'pacientes' %}active{% endif %}">
+                    Pacientes
+                </a>
+
+                <a href="{{ url_for('register') }}"
+                   class="{% if request.endpoint == 'register' %}active{% endif %}">
+                    Registrar paciente
+                </a>
+
+                <a href="{{ url_for('appointment') }}"
+                   class="{% if request.endpoint == 'appointment' %}active{% endif %}">
+                    Nueva cita
+                </a>
+
+                <a href="{{ url_for('vets') }}"
+                   class="{% if request.endpoint == 'vets' %}active{% endif %}">
+                    Equipo
+                </a>
             </div>
 
             <span class="badge">Feria de Innovación Tecnológica</span>

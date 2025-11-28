@@ -60,8 +60,9 @@ body {
     font-size: 14px;
     text-decoration: none;
     color: #f5f5f5;
-    padding: 4px 10px;
-    border-radius: 99px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    transition: 0.15s;
 }
 
 .nav-links a:hover {
@@ -69,10 +70,19 @@ body {
     color: #ffffff;
 }
 
+/* 🔥 Pestaña activa */
+.nav-links a.active {
+    background: var(--accent);
+    color: #000000;
+    font-weight: 600;
+    box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+}
+
+/* Badge */
 .badge {
     margin-left: auto;
     font-size: 11px;
-    background: #1976D2;
+    background: var(--primary);
     color: #ffffff;
     padding: 4px 10px;
     border-radius: 999px;
@@ -187,50 +197,6 @@ body {
     margin: 2px 0 0 0;
     font-size: 13px;
     color: var(--text-soft);
-}
-
-.hero-actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-/* Stats panel */
-.stats h2 {
-    margin: 0 0 6px 0;
-    font-size: 17px;
-}
-
-.stats-desc {
-    font-size: 13px;
-    color: var(--text-soft);
-    margin-bottom: 10px;
-}
-
-.stat-item {
-    padding: 8px 0;
-    border-top: 1px solid #EEF0FA;
-}
-
-.stat-title {
-    font-size: 12px;
-    color: var(--text-soft);
-}
-
-.stat-value {
-    display: block;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.stat-note {
-    font-size: 12px;
-    color: var(--text-soft);
-}
-
-.stat-urgent {
-    color: var(--danger);
 }
 
 /* Buttons */
@@ -741,7 +707,9 @@ textarea {
 
     .nav-links {
         margin-left: 0;
+        color: #fcb424;
     }
+
 
     .form-row {
         flex-direction: column;
