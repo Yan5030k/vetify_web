@@ -62,6 +62,15 @@
                 <p class="patient-line"><strong>Responsable:</strong> {{ p['dueno'] }}</p>
                 <p class="patient-line"><strong>Teléfono:</strong> {{ p['dueno_telefono'] }}</p>
                 <p class="patient-line"><strong>Correo:</strong> {{ p['dueno_correo'] }}</p>
+                
+                <p class="patient-line">
+                    <strong>Fecha de registro:</strong> 
+                    {% if p['fecha_registro'] %}
+                        {{ p['fecha_registro'][8:10] }}/{{ p['fecha_registro'][5:7] }}/{{ p['fecha_registro'][0:4] }}
+                    {% else %}
+                        No disponible
+                    {% endif %}
+                </p>
             </div>
         </article>
 

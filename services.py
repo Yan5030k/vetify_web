@@ -39,10 +39,15 @@ def crear_mascota(
 ) -> int:
     conn = get_connection()
     cur = conn.cursor()
+    
+    # MODIFICADO: Calculamos la fecha en Python y la enviamos explícitamente
+    # Esto asegura que se guarde la fecha aunque la BD no tenga el DEFAULT configurado tras la migración.
+    fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     cur.execute(
-        """INSERT INTO mascotas (nombre, tipo, raza, edad, peso, dueno_id)
-           VALUES (?, ?, ?, ?, ?, ?);""",
-        (nombre, tipo, raza, edad, peso, dueno_id)
+        """INSERT INTO mascotas (nombre, tipo, raza, edad, peso, dueno_id, fecha_registro)
+           VALUES (?, ?, ?, ?, ?, ?, ?);""",
+        (nombre, tipo, raza, edad, peso, dueno_id, fecha_actual)
     )
     conn.commit()
     mascota_id = cur.lastrowid
@@ -70,6 +75,7 @@ def listar_pacientes_detalle():
     """
     conn = get_connection()
     cur = conn.cursor()
+    # Incluimos fecha_registro en la consulta
     cur.execute("""
         SELECT m.id,
                m.nombre,
@@ -77,6 +83,7 @@ def listar_pacientes_detalle():
                m.raza,
                m.edad,
                m.peso,
+               m.fecha_registro,
                d.nombre   AS dueno,
                d.telefono AS dueno_telefono,
                d.correo   AS dueno_correo
@@ -163,9 +170,6 @@ def listar_citas_hoy():
 
 
 def listar_citas_todas():
-    """
-    Lista todas las citas (pasadas y futuras), ordenadas por fecha y hora.
-    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
@@ -193,9 +197,6 @@ def listar_citas_todas():
 
 
 def obtener_cita_por_id(cita_id: int):
-    """
-    Devuelve una sola cita con toda la información relacionada (para detalle).
-    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
@@ -225,9 +226,6 @@ def obtener_cita_por_id(cita_id: int):
 
 
 def obtener_cita_cruda(cita_id: int):
-    """
-    Devuelve la cita directamente de la tabla citas (para editar: ids y fecha/hora exacta).
-    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
@@ -306,10 +304,6 @@ def contar_citas_urgencia_hoy() -> Dict[str, int]:
 
 
 def existe_cita_en_horario(vet_id: int, fecha_hora: datetime, excluir_id: int | None = None) -> bool:
-    """
-    Devuelve True si el veterinario ya tiene una cita exactamente
-    en esa fecha y hora. Permite opcionalmente excluir una cita (para edición).
-    """
     conn = get_connection()
     cur = conn.cursor()
     if excluir_id is None:
@@ -332,53 +326,33 @@ def existe_cita_en_horario(vet_id: int, fecha_hora: datetime, excluir_id: int | 
 # --------- Lógica de urgencia ---------
 
 def analizar_urgencia(sintomas: str) -> str:
-    """
-    Clasifica la urgencia de la cita según los síntomas descritos.
-    - alta  : riesgo fuerte inmediato (sangrado, no respira, convulsiones, muy débil, etc.)
-    - media : dolor moderado, diarrea, tos, herida abierta, problemas post-operatorios, etc.
-    - baja  : controles, síntomas leves o generales.
-    """
     texto = (sintomas or "").lower()
-
-    # --- patrones fuertes: URGENCIA ALTA ---
     palabras_alta = [
         "sangra", "sangrado", "hemorragia",
         "no respira", "dificultad para respirar", "ahogando",
         "convulsiona", "convulsión", "convulsiones",
         "muy débil", "muy debil",
-        "no se mueve", "inconsciente"
+        "no se mueve", "inconsciente" 
     ]
-
     for p in palabras_alta:
         if p in texto:
             return "alta"
 
-    # --- casos post-operatorios / herida ---
     if "herida" in texto or "puntos" in texto or "sutura" in texto or "post operatorio" in texto or "post-operatorio" in texto:
-        # si además menciona sangrado → subir a ALTA
         if "sangra" in texto or "sangrado" in texto or "hemorragia" in texto:
             return "alta"
-        # si dice que se abrió / está abierta → MEDIA
         if "abrió" in texto or "abrio" in texto or "abierta" in texto or "abierto" in texto or "se le abrió" in texto:
             return "media"
-        # cualquier herida post-operatoria la consideramos al menos MEDIA
         return "media"
 
-    # --- síntomas de URGENCIA MEDIA ---
     palabras_media = [
-        "no quiere jugar",
-        "triste",
-        "no bebe",
+        "no quiere jugar", "triste", "no bebe",
         "apatía", "apatico", "apática",
-        "diarrea",
-        "tos",
-        "cojea", "cojera",
+        "diarrea", "tos", "cojea", "cojera",
         "dolor", "molestia", "no apoya la pata"
     ]
-
     for p in palabras_media:
         if p in texto:
             return "media"
 
-    # Si no hay palabras clave graves, se asume baja urgencia
     return "baja"
