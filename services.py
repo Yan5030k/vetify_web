@@ -356,3 +356,42 @@ def analizar_urgencia(sintomas: str) -> str:
             return "media"
 
     return "baja"
+
+
+# ... (imports existentes)
+# Añade este import si no lo tienes, aunque solo usaremos SQL aquí
+from db import get_connection 
+
+# ... (Resto del código de services.py igual que antes...)
+
+# --------- USUARIOS Y AUTENTICACIÓN (NUEVO) ---------
+
+def obtener_usuario_por_username(username: str):
+    """
+    Busca un usuario en la BD por su nombre de usuario.
+    Devuelve la fila completa (incluyendo password hasheado) o None.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM usuarios WHERE username = ?", (username,))
+    user = cur.fetchone()
+    conn.close()
+    return user
+
+def crear_usuario(username, password_hash, rol="secretaria"):
+    """
+    Función útil por si en el futuro quieres crear más usuarios desde la web.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)",
+            (username, password_hash, rol)
+        )
+        conn.commit()
+        return True
+    except:
+        return False
+    finally:
+        conn.close()

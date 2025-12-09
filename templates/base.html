@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    {% if session.get('user_id') %}
     <div class="topbar">
         <div class="topbar-inner">
             <a class="brand-link" href="{{ url_for('index') }}">
@@ -32,7 +33,7 @@
 
                 <a href="{{ url_for('register') }}"
                    class="{% if request.endpoint == 'register' %}active{% endif %}">
-                    Registrar paciente
+                    Registrar
                 </a>
 
                 <a href="{{ url_for('appointment') }}"
@@ -46,11 +47,16 @@
                 </a>
             </div>
 
-            <span class="badge">Feria de Innovación Tecnológica</span>
+            <div class="user-menu">
+                <span class="user-welcome">Hola, {{ session.get('username') }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-logout">Salir</a>
+            </div>
         </div>
     </div>
+    {% endif %}
 
     <div class="page">
+        {% if request.endpoint != 'login' %}
         <div class="flash-container">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -60,12 +66,15 @@
                 {% endif %}
             {% endwith %}
         </div>
+        {% endif %}
 
         {% block content %}{% endblock %}
     </div>
 
+    {% if session.get('user_id') %}
     <div class="footer">
         Vetify · Gestión inteligente de citas veterinarias · 2025
     </div>
+    {% endif %}
 </body>
 </html>

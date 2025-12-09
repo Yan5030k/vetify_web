@@ -139,7 +139,7 @@ body {
 /* Layouts */
 .layout {
     display: grid;
-    grid-template-columns: minmax(0, 2.5fr) minmax(260px, 1.1fr);
+    grid-template-columns: minmax(0, 2.5fr) minmax(280px, 1.1fr); /* Ajustado un poco el ancho */
     gap: 20px;
 }
 
@@ -691,41 +691,6 @@ textarea {
     font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 800px) {
-    .layout {
-        grid-template-columns: 1fr;
-    }
-
-    .topbar-inner {
-        flex-wrap: wrap;
-    }
-
-    .badge {
-        margin-left: 0;
-    }
-
-    .nav-links {
-        margin-left: 0;
-        color: #fcb424;
-    }
-
-
-    .form-row {
-        flex-direction: column;
-    }
-
-    .form-actions {
-        justify-content: flex-start;
-    }
-
-    .calendar-toolbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-
 .actions-cell {
     text-align: right;
     white-space: nowrap;
@@ -750,3 +715,208 @@ textarea {
     color: var(--danger);
 }
 
+/* Responsive */
+@media (max-width: 800px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar-inner {
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        margin-left: 0;
+    }
+
+    .nav-links {
+        margin-left: 0;
+        color: #fcb424;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-actions {
+        justify-content: flex-start;
+    }
+
+    .calendar-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+/* ===== STATS SIDEBAR (Resumen Rápido) ===== */
+.stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* Controlamos el gap con margins */
+}
+
+.stats h2 {
+    margin-top: 0;
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.stats-desc {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.stat-item {
+    background: #F8F9FA;
+    border: 1px solid #EEF0F6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--primary); /* Acento de color por defecto */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: #FFFFFF;
+}
+
+.stat-title {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+}
+
+/* Color especial para el número de urgencias altas */
+.stat-value.stat-urgent {
+    color: var(--danger);
+}
+
+.stat-note {
+    display: block;
+    font-size: 12px;
+    color: #90A4AE;
+    margin-top: 6px;
+}
+
+
+
+/* ... (Todo tu CSS anterior) ... */
+
+/* ===== LOGIN PAGE ===== */
+
+.login-body {
+    background: #E8EAF6; /* Un tono ligeramente diferente para el login */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-card {
+    padding: 40px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.login-header img {
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.login-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--primary-dark);
+}
+
+.login-header p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: var(--text-soft);
+}
+
+.btn-block {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 15px;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: #90A4AE;
+    border-top: 1px solid #F0F0F0;
+    padding-top: 14px;
+}
+
+/* User Menu en Topbar */
+.user-menu {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-welcome {
+    font-size: 13px;
+    color: #FFF;
+    font-weight: 500;
+}
+
+.btn-logout {
+    font-size: 12px;
+    color: #FFCDD2;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: 999px;
+    transition: 0.2s;
+}
+
+.btn-logout:hover {
+    background: rgba(255,0,0,0.1);
+    color: #FF5252;
+    border-color: #FF5252;
+}
+
+/* Ajuste responsive para topbar con login */
+@media (max-width: 800px) {
+    .user-menu {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #222;
+    }
+}

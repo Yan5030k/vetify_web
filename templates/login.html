@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - Vetify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/Blanco.png') }}">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="card login-card">
+            <div class="login-header">
+                <img src="{{ url_for('static', filename='img/Negro.png') }}" alt="Vetify Logo">
+                <h1>Iniciar Sesión</h1>
+                <p>Acceso al sistema de gestión</p>
+            </div>
+
+            <div class="flash-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, msg in messages %}
+                            <div class="flash flash-{{ category }}">{{ msg }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <form method="post" action="{{ url_for('login') }}">
+                <label>
+                    <span>Usuario</span>
+                    <input type="text" name="username" placeholder="ej. admin" required autofocus>
+                </label>
+
+                <label>
+                    <span>Contraseña</span>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </label>
+
+                <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+            </form>
+            
+            <div class="login-footer">
+                Vetify v1.0 · Acceso restringido
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
