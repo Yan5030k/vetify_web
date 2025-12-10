@@ -81,11 +81,11 @@ def init_db():
         columnas = [col[1] for col in cur.fetchall()]
 
         if "fecha_registro" not in columnas:
-            print("⚠️ Actualizando estructura de BD (Mascotas)...")
+            print(" Actualizando estructura de BD (Mascotas)...")
             cur.execute("ALTER TABLE mascotas ADD COLUMN fecha_registro TEXT")
             cur.execute("UPDATE mascotas SET fecha_registro = datetime('now', 'localtime') WHERE fecha_registro IS NULL")
             conn.commit()
-            print("✅ Columna 'fecha_registro' agregada.")
+            print(" Columna 'fecha_registro' agregada.")
     except Exception as e:
         print(f"Nota sobre migración: {e}")
     # -------------------------------------
@@ -125,7 +125,7 @@ def seed_admin():
     c = cur.fetchone()["c"]
     
     if c == 0:
-        print("👤 Creando usuario administrador por defecto...")
+        print(" Creando usuario administrador por defecto...")
         # Creamos usuario 'admin' con contraseña 'admin123' (encriptada)
         password_hash = generate_password_hash("admin123")
         cur.execute(
@@ -133,6 +133,6 @@ def seed_admin():
             ("admin", password_hash, "admin")
         )
         conn.commit()
-        print("✅ Usuario 'admin' creado. Contraseña: 'admin123'")
+        print(" Usuario 'admin' creado. Contraseña: 'admin123'")
     
     conn.close()
